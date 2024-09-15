@@ -1,9 +1,11 @@
 import sys
 from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtGui import QPixmap, QFontDatabase
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
+    QSizePolicy, QApplication, QFileDialog, QHBoxLayout
 )
 import config.gradient
 
@@ -34,6 +36,7 @@ class TaoApp(QWidget):
     def init_ui(self):
         """Инициализация пользовательского интерфейса."""
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setStyleSheet(config.gradient.gradient_brown)  # Фон для основного виджета
         self.setWindowTitle('Tao Player')
 
         layout = QVBoxLayout()
@@ -56,13 +59,43 @@ class TaoApp(QWidget):
     def setup_menu_control_video(self):
         """Создание меню управления."""
         menu_label = self.create_label("МЕНЮ УПРАВЛЕНИЯ", 155)
-        menu_label.setStyleSheet(config.gradient.gradient_brown)
         return menu_label
 
     def setup_header_service_menu(self):
+        """Создание шапки с вложенным QHBoxLayout."""
+        header_layout = QHBoxLayout()
+        header_layout.setContentsMargins(0, 0, 0, 0)
+        header_layout.setSpacing(0)
 
+        # Внутренний QHBoxLayout
+        inner_layout = QHBoxLayout()
+        inner_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        inner_layout.setContentsMargins(0, 0, 0, 0)
+        inner_layout.setSpacing(10)  # Установите нужное расстояние между элементами
 
+        # Иконка
+        icon = QLabel()
+        pixmap = QPixmap("logo.jpg")  # Замените на путь к вашему изображению
+        icon.setPixmap(pixmap)
+        icon.setMaximumHeight(40)  # Ограничиваем высоту иконки
 
+        # Название плеера
+        name_player = QLabel('<span style="color: red;">Tao</span> <span style="color: white;">Player</span>')
+        name_player.setStyleSheet("background: transparent; font-family: 'YourFontFamily'; font-size: 20px; font-weight: bold;")  # Жирный шрифт
+
+        # Версия плеера
+        version = QLabel("v1.0")
+        version.setStyleSheet("background: transparent; font-family: 'YourFontFamily'; font-size: 16px; font-weight: bold;")  # Жирный шрифт
+
+        # Добавляем элементы во внутренний layout
+        inner_layout.addWidget(name_player)
+        inner_layout.addWidget(icon)
+        inner_layout.addWidget(version)
+
+        # Добавляем внутренний layout в основной layout
+        header_layout.addLayout(inner_layout)
+
+        return header_layout
 
     def create_label(self, text, height):
         """Создание метки."""
@@ -105,10 +138,3 @@ class TaoApp(QWidget):
         self.media_player.setSource(QUrl.fromLocalFile(video_file))
         self.media_player.play()  # Запускаем воспроизведение
         print("Воспроизведение видео начато.")
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = TaoApp()
-    window.show()
-    sys.exit(app.exec())

@@ -1,14 +1,11 @@
 import sys
 from PyQt6.QtCore import Qt, QUrl
-from PyQt6.QtGui import QPicture, QPixmap
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
-    QSizePolicy, QApplication, QFileDialog, QHBoxLayout
 )
 import config.gradient
-from styles.main_window import default_text
 
 
 class TaoApp(QWidget):
@@ -37,7 +34,6 @@ class TaoApp(QWidget):
     def init_ui(self):
         """Инициализация пользовательского интерфейса."""
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        self.setStyleSheet(config.gradient.gradient_brown)
         self.setWindowTitle('Tao Player')
 
         layout = QVBoxLayout()
@@ -64,42 +60,9 @@ class TaoApp(QWidget):
         return menu_label
 
     def setup_header_service_menu(self):
-        """Создание шапки с вложенным QHBoxLayout."""
-        header_layout = QHBoxLayout()
-        header_layout.setContentsMargins(0, 0, 0, 0)
-        header_layout.setSpacing(0)
-
-        # Внутренний QHBoxLayout
-        inner_layout = QHBoxLayout()
-        inner_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
-        inner_layout.setContentsMargins(0, 0, 0, 0)
-        inner_layout.setSpacing(10)  # Установите нужное расстояние между элементами
-
-        # Иконка
-        icon = QLabel()
-        pixmap = QPixmap("logo.jpg")  # Замените на путь к вашему изображению
-        icon.setStyleSheet('background: transparent;')
-        icon.setPixmap(pixmap)
-        icon.setMaximumHeight(40)  # Ограничиваем высоту иконки
-
-        # Название плеера
-        name_player = QLabel('<span style="color: #FFFFFF;">Tao</span> <span style="color: #BD321D;">Player</span>')
-        name_player.setStyleSheet(default_text + 'font-weight: bold; font-size: 16px;')
-
-        # Версия плеера
-        version = QLabel("ver. 0.1 alpha")
-        version.setStyleSheet(default_text + 'font-weight: regular; font-size: 14px;')
-
-        # Добавляем элементы во внутренний layout
-        inner_layout.addWidget(name_player)
-        inner_layout.addWidget(icon)
-        inner_layout.addWidget(version)
-
-        # Добавляем внутренний layout в основной layout
-        header_layout.addLayout(inner_layout)
 
 
-        return header_layout
+
 
     def create_label(self, text, height):
         """Создание метки."""

@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
     QSizePolicy, QApplication, QFileDialog, QHBoxLayout
 )
 import config.gradient
+from styles.main_window import default_text
 
 
 class TaoApp(QWidget):
@@ -81,11 +82,11 @@ class TaoApp(QWidget):
 
         # Название плеера
         name_player = QLabel('<span style="color: red;">Tao</span> <span style="color: white;">Player</span>')
-        name_player.setStyleSheet("background: transparent; font-family: 'YourFontFamily'; font-size: 20px; font-weight: bold;")  # Жирный шрифт
+        name_player.setStyleSheet(default_text + "font-size: 20px; font-weight: bold;")  # Жирный шрифт
 
         # Версия плеера
         version = QLabel("v1.0")
-        version.setStyleSheet("background: transparent; font-family: 'YourFontFamily'; font-size: 16px; font-weight: bold;")  # Жирный шрифт
+        version.setStyleSheet(default_text + "font-size: 16px; font-weight: bold;")  # Жирный шрифт
 
         # Добавляем элементы во внутренний layout
         inner_layout.addWidget(name_player)

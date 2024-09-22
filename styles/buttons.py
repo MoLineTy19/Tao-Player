@@ -4,7 +4,7 @@ QPushButton {
     outline: none;          /* Убираем контур */
     color: white;                /* Белый текст */
     border: none;               /* Убираем границу */
-    padding: 10px 20px;        /* Внутренние отступы */
+    padding: 0;                /* Убираем внутренние отступы */
     font-size: 16px;           /* Размер шрифта */
     font-weight: bold;         /* Жирный шрифт */
     transition: background 0.3s, transform 0.2s; /* Плавный переход фона и эффекта нажатия */

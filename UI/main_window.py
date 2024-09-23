@@ -1,11 +1,11 @@
 import sys
-from PyQt6.QtCore import Qt, QUrl, QSize
-from PyQt6.QtGui import QPixmap, QIcon
+from PyQt6.QtCore import Qt, QUrl, QSize, QPoint
+from PyQt6.QtGui import QPixmap, QIcon, QAction, QCursor
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
-    QSizePolicy, QApplication, QFileDialog, QHBoxLayout
+    QSizePolicy, QApplication, QFileDialog, QHBoxLayout, QMenuBar, QToolBar, QMenu
 )
 import config.gradient
 from config import app
@@ -16,7 +16,6 @@ from styles.main_window import default_text
 class TaoApp(QWidget):
     def __init__(self):
         super().__init__()
-
 
         self.drag_start_position = None
         self.default_window_geometry = (300, 200, 1280, 720)
@@ -131,18 +130,18 @@ class TaoApp(QWidget):
         menu_button.setFixedSize(40, 40)  # Устанавливаем фиксированный размер кнопки
         menu_button.setStyleSheet(button_style)
         inner_layout.addWidget(menu_button)
+        menu_button.clicked.connect(self.show_menu)
 
-
+        # Логотип
         self.title_window_icon = QLabel(self)
         logo_pixmap = QPixmap("logo.jpg")
         self.title_window_icon.setPixmap(logo_pixmap)
         self.title_window_icon.setStyleSheet('QLabel { background-color: transparent; }')
 
-
-
         # Название плеера
-        self.name_header_text = QLabel('<span style="color: white;">Tao</span> <span style="color: #9C0303;">Player</span>',
-                                   self)
+        self.name_header_text = QLabel(
+            '<span style="color: white;">Tao</span> <span style="color: #9C0303;">Player</span>',
+            self)
         self.name_header_text.setStyleSheet(default_text + "font-size: 16px; font-weight: bold;")
 
         # Версия плеера
@@ -152,6 +151,44 @@ class TaoApp(QWidget):
         self.update_position_header_info()
         return inner_layout
 
+    def show_menu(self):
+        """Создание и отображение меню инструментов."""
+        menu = QMenu(self)
+        menu.setStyleSheet("""
+            QMenu {
+                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, 
+                                             stop: 0 rgba(198, 110, 85, 51),  /* 20% прозрачность */
+                                             stop: 1 rgba(153, 86, 67, 51));  /* 20% прозрачность */
+                padding: 5px;                        
+            }
+            QMenu::item {
+                color: white;                        
+                padding: 8px 20px;                  
+            }
+            QMenu::item:selected {
+                background-color: rgba(255, 255, 255, 0.2);  
+            }
+            QMenu::separator {
+                height: 2px;                        
+                background-color: #444;             
+                margin: 5px 0;                      
+            }
+        """)
+
+        # Добавление действий в меню
+        action_load = QAction("Загрузить", self)
+        action_load.triggered.connect(self.on_load_video_button_clicked)
+        menu.addAction(action_load)
+
+        action_settings = QAction("Настройки", self)
+        # action_settings.triggered.connect()
+        menu.addAction(action_settings)
+
+        action_exit = QAction("Выход", self)
+        action_exit.triggered.connect(self.close)
+        menu.addAction(action_exit)
+
+        menu.exec(QPoint(self.pos().x(), self.pos().y() + 40))
 
     def update_position_header_info(self):
         width = self.size().width()

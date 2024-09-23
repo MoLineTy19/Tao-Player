@@ -91,9 +91,6 @@ class TaoApp(QWidget):
         header_layout.setSpacing(0)
 
         inner_layout = self.create_header_info()
-
-
-
         header_layout.addLayout(inner_layout)
 
         return header_layout
@@ -167,13 +164,6 @@ class TaoApp(QWidget):
             self.name_header_text.move(535, 5)
             self.version_header_text.move(670, 4)
 
-    def create_button(self, text):
-        """Создание кнопки."""
-        button = QPushButton(text)
-        button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        button.clicked.connect(self.on_load_video_button_clicked)
-        return button
-
     def mousePressEvent(self, event):
         """Обработка нажатия мыши."""
         if event.button() == Qt.MouseButton.LeftButton:
@@ -209,8 +199,8 @@ class TaoApp(QWidget):
         """Максимизация окна."""
         screen = QApplication.primaryScreen()
         screen_rect = screen.geometry()
-        if self.geometry() == screen_rect:
 
+        if self.geometry() == screen_rect:
             self.showNormal()
             self.update_coordinate_video_widget()
             self.update_position_control_buttons()
@@ -223,6 +213,5 @@ class TaoApp(QWidget):
             self.update_position_header_info()
 
     def wrap_window(self):
-
         """Сворачивание окна"""
         self.showMinimized()

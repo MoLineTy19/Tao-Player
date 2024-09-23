@@ -21,11 +21,12 @@ class TaoApp(QWidget):
         self.drag_start_position = None
         self.default_window_geometry = (300, 200, 1280, 720)
         self.resize(self.default_window_geometry[2], self.default_window_geometry[3])
+
         # Инициализация медиаплеера и виджета видео
         self.media_player = QMediaPlayer()
         self.audio_output = QAudioOutput()
         self.video_widget = QVideoWidget()
-        self.update_coordinate_default_video_widget()
+        self.update_coordinate_video_widget()
 
         self.media_player.setAudioOutput(self.audio_output)
         self.media_player.setVideoOutput(self.video_widget)
@@ -41,15 +42,14 @@ class TaoApp(QWidget):
         self.initialize_ui()
         self.set_window_position()
 
-    def update_coordinate_default_video_widget(self):
+    def update_coordinate_video_widget(self):
         """Настройка виджета видео."""
-        self.video_widget.setMinimumWidth(1280)
-        self.video_widget.setMinimumHeight(525)
-
-    def update_coordinate_maximize_video_widget(self):
-        """Настройка виджета видео."""
-        self.video_widget.setMinimumWidth(1920)
-        self.video_widget.setMinimumHeight(885)
+        if self.isFullScreen():
+            self.video_widget.setMinimumWidth(1920)
+            self.video_widget.setMinimumHeight(885)
+        else:
+            self.video_widget.setMinimumWidth(1280)
+            self.video_widget.setMinimumHeight(525)
 
     def initialize_ui(self):
         """Инициализация пользовательского интерфейса."""
@@ -135,12 +135,12 @@ class TaoApp(QWidget):
         menu_button.setStyleSheet(button_style)
         inner_layout.addWidget(menu_button)
 
-        # Иконка
+
         self.title_window_icon = QLabel(self)
         logo_pixmap = QPixmap("logo.jpg")
         self.title_window_icon.setPixmap(logo_pixmap)
         self.title_window_icon.setStyleSheet('QLabel { background-color: transparent; }')
-        self.title_window_icon.move(self.size().width() // 2 - logo_pixmap.width() // 2, 5)
+
 
 
         # Название плеера
@@ -155,11 +155,17 @@ class TaoApp(QWidget):
         self.update_position_header_info()
         return inner_layout
 
+
     def update_position_header_info(self):
         width = self.size().width()
-        self.title_window_icon.move(width // 2, 5)
-        self.name_header_text.move(int(width * 0.43), 5)
-        self.version_header_text.move(int(width * 0.5365), 4)
+        if self.isFullScreen():
+            self.title_window_icon.move(947, 5)
+            self.name_header_text.move(855, 5)
+            self.version_header_text.move(990, 4)
+        else:
+            self.title_window_icon.move(627, 5)
+            self.name_header_text.move(535, 5)
+            self.version_header_text.move(670, 4)
 
     def create_button(self, text):
         """Создание кнопки."""
@@ -206,16 +212,17 @@ class TaoApp(QWidget):
         if self.geometry() == screen_rect:
 
             self.showNormal()
-            self.update_coordinate_default_video_widget()
+            self.update_coordinate_video_widget()
             self.update_position_control_buttons()
             self.update_position_header_info()
         else:
             # тут надо сделать перемещение элементов либо настроить на % изменение
             self.showFullScreen()
-            self.update_coordinate_maximize_video_widget()
+            self.update_coordinate_video_widget()
             self.update_position_control_buttons()
             self.update_position_header_info()
 
     def wrap_window(self):
+
         """Сворачивание окна"""
         self.showMinimized()

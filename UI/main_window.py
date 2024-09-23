@@ -5,13 +5,14 @@ from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
-    QSizePolicy, QApplication, QFileDialog, QHBoxLayout, QMenuBar, QToolBar, QMenu
+    QSizePolicy, QApplication, QFileDialog, QHBoxLayout, QMenuBar, QToolBar, QMenu, QSlider
 )
 import config.gradient
 import styles.menu
 from config import app
 from styles.buttons import style_control_button, style_action_button, style_mini_act_button
 from styles.main_window import default_text
+from styles.slider import style_volume_slider
 
 
 class TaoApp(QWidget):
@@ -110,11 +111,32 @@ class TaoApp(QWidget):
         last_episode.setIconSize(QSize(35, 35))
         last_episode.setStyleSheet(style_mini_act_button)
 
+        volume_slider = QSlider(Qt.Orientation.Horizontal)
+        volume_slider.setRange(0, 100)
+        volume_slider.setValue(50)
+        volume_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        volume_slider.setStyleSheet(style_volume_slider)
+        # volume_slider.valueChanged.connect(self.change_volume)
+
+        label = QLabel()
+        label.setText('One piece - 1 episode\n'
+                      'One piece - 1 episode\n'
+                      'One piece - 1 episode')
+        label.setStyleSheet(default_text + "font-size: 18px; font-weight: bold; color: white;")
+
+        maximize = QPushButton()
+        maximize.setIcon(QIcon("resources/maximize_black.png"))
+        maximize.setIconSize(QSize(35, 35))
+        maximize.setStyleSheet(style_mini_act_button)
+
+        control_layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignRight, stretch=15)
         control_layout.addWidget(last_episode, alignment=Qt.AlignmentFlag.AlignRight, stretch=15)
-        control_layout.addWidget(go_back, alignment=Qt.AlignmentFlag.AlignRight, stretch=3)
-        control_layout.addWidget(self.action_video, alignment=Qt.AlignmentFlag.AlignCenter, stretch=5)
-        control_layout.addWidget(fast_forward, alignment=Qt.AlignmentFlag.AlignLeft, stretch=3)
-        control_layout.addWidget(next_episode, alignment=Qt.AlignmentFlag.AlignLeft, stretch=15)
+        control_layout.addWidget(go_back, alignment=Qt.AlignmentFlag.AlignRight, stretch=4)
+        control_layout.addWidget(self.action_video, alignment=Qt.AlignmentFlag.AlignCenter, stretch=7)
+        control_layout.addWidget(fast_forward, alignment=Qt.AlignmentFlag.AlignLeft, stretch=4)
+        control_layout.addWidget(next_episode, alignment=Qt.AlignmentFlag.AlignLeft, stretch=18)
+        control_layout.addWidget(volume_slider, alignment=Qt.AlignmentFlag.AlignLeft, stretch=10)
+        control_layout.addWidget(maximize, alignment=Qt.AlignmentFlag.AlignLeft, stretch=5)
 
         # Создаем виджет и устанавливаем в него layout
         control_widget = QWidget()

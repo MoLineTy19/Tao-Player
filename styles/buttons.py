@@ -1,4 +1,4 @@
-button_style = """
+style_control_button = """
 QPushButton {
     background: transparent;
     outline: none;          /* Убираем контур */
@@ -25,4 +25,38 @@ QPushButton:pressed {
     transform: scale(0.95); /* Уменьшение кнопки при нажатии */
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3); /* Уменьшение тени при нажатии */
 }
+"""
+
+style_action_button = """
+    QPushButton {
+        background: white;                  /* Фоновый цвет */
+        border-radius: 32px;                /* Закругление углов кнопки */
+        transition: background-color 0.3s, color 0.3s; /* Плавный переход */
+    }
+    QPushButton:hover {
+        background: #F0E0D0;                /* Цвет фона при наведении */
+        color: #A35B45;                     /* Цвет текста при наведении */
+    }
+    QPushButton:pressed {
+        background: #D8CFC0;                /* Цвет фона при нажатии */
+        color: #7A4A3A;                     /* Цвет текста при нажатии */
+    }
+"""
+
+style_mini_act_button = """
+    QPushButton {
+        background: white;                  /* Фоновый цвет */
+        width: 47px;                         /* Ширина кнопки */
+        height: 47px;                        /* Высота кнопки */
+        border-radius: 22px;                /* Закругление углов кнопки */
+        transition: background-color 0.3s, color 0.3s; /* Плавный переход */
+    }
+    QPushButton:hover {
+        background: #F0E0D0;                /* Цвет фона при наведении */
+        color: #A35B45;                     /* Цвет текста при наведении */
+    }
+    QPushButton:pressed {
+        background: #D8CFC0;                /* Цвет фона при нажатии */
+        color: #7A4A3A;                     /* Цвет текста при нажатии */
+    }
 """

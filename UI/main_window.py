@@ -8,8 +8,9 @@ from PyQt6.QtWidgets import (
     QSizePolicy, QApplication, QFileDialog, QHBoxLayout, QMenuBar, QToolBar, QMenu
 )
 import config.gradient
+import styles.menu
 from config import app
-from styles.buttons import button_style
+from styles.buttons import style_control_button, style_action_button, style_mini_act_button
 from styles.main_window import default_text
 
 
@@ -64,7 +65,7 @@ class TaoApp(QWidget):
 
         layout.addLayout(self.create_header_menu())
         layout.addWidget(self.video_widget)
-        layout.addWidget(self.create_control_menu(), alignment=Qt.AlignmentFlag.AlignBottom)
+        layout.addWidget(self.create_control_menu())
 
         self.setLayout(layout)
 
@@ -78,11 +79,51 @@ class TaoApp(QWidget):
     def create_control_menu(self):
         """Создание меню управления."""
 
-        label = QLabel("МЕНЮ УПРАВЛЕНИЯ")
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
-        label.setFixedHeight(155)
-        return label
+        control_layout = QHBoxLayout()
+        control_layout.setContentsMargins(0, 0, 0, 0)
+        control_layout.setSpacing(0)
 
+        self.action_video = QPushButton()
+        self.action_video.setIcon(QIcon("resources/pause.png"))
+        self.action_video.setIconSize(QSize(65, 65))
+        self.action_video.setStyleSheet(style_action_button)
+        self.action_video.clicked.connect(self.play_video)
+
+        fast_forward = QPushButton()
+        fast_forward.setIcon(QIcon("resources/fast_forward.png"))
+        fast_forward.setIconSize(QSize(35, 35))
+        fast_forward.setStyleSheet(style_mini_act_button)
+        # fast_forward.clicked.connect(self.fast_forward)
+
+        go_back = QPushButton()
+        go_back.setIcon(QIcon("resources/go_back.png"))
+        go_back.setIconSize(QSize(35, 35))
+        go_back.setStyleSheet(style_mini_act_button)
+
+        next_episode = QPushButton()
+        next_episode.setIcon(QIcon("resources/next_episode.png"))
+        next_episode.setIconSize(QSize(35, 35))
+        next_episode.setStyleSheet(style_mini_act_button)
+
+        last_episode = QPushButton()
+        last_episode.setIcon(QIcon("resources/last_episode.png"))
+        last_episode.setIconSize(QSize(35, 35))
+        last_episode.setStyleSheet(style_mini_act_button)
+
+        control_layout.addWidget(last_episode, alignment=Qt.AlignmentFlag.AlignRight, stretch=15)
+        control_layout.addWidget(go_back, alignment=Qt.AlignmentFlag.AlignRight, stretch=3)
+        control_layout.addWidget(self.action_video, alignment=Qt.AlignmentFlag.AlignCenter, stretch=5)
+        control_layout.addWidget(fast_forward, alignment=Qt.AlignmentFlag.AlignLeft, stretch=3)
+        control_layout.addWidget(next_episode, alignment=Qt.AlignmentFlag.AlignLeft, stretch=15)
+
+        # Создаем виджет и устанавливаем в него layout
+        control_widget = QWidget()
+        control_widget.setLayout(control_layout)
+
+
+
+
+        return control_widget  # Возвращаем виджет, а не layout
     def create_header_menu(self):
         """Создание шапки окна"""
         header_layout = QHBoxLayout()
@@ -102,6 +143,7 @@ class TaoApp(QWidget):
         self.update_position_control_buttons()
 
     def update_position_control_buttons(self):
+        """Позиционирование кнопок для хедера"""
         width = self.size().width()
         self.wrap_button.move(width - 40 * 3, 0)
         self.maximize_button.move(width - 40 * 2, 0)
@@ -110,7 +152,7 @@ class TaoApp(QWidget):
     def create_icon_button(self, icon_path, action=None):
         """Генератор кнопок для хедера"""
         button = QPushButton(self)
-        button.setStyleSheet(button_style)
+        button.setStyleSheet(style_control_button)
         button.setIcon(QIcon(icon_path))
         button.setIconSize(QSize(40, 40))
         button.setFixedSize(40, 40)
@@ -128,7 +170,7 @@ class TaoApp(QWidget):
         menu_button.setIcon(QIcon("resources/menu.png"))
         menu_button.setIconSize(QSize(32, 32))  # Устанавливаем размер иконки
         menu_button.setFixedSize(40, 40)  # Устанавливаем фиксированный размер кнопки
-        menu_button.setStyleSheet(button_style)
+        menu_button.setStyleSheet(style_control_button)
         inner_layout.addWidget(menu_button)
         menu_button.clicked.connect(self.show_menu)
 
@@ -154,26 +196,7 @@ class TaoApp(QWidget):
     def show_menu(self):
         """Создание и отображение меню инструментов."""
         menu = QMenu(self)
-        menu.setStyleSheet("""
-            QMenu {
-                background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, 
-                                             stop: 0 rgba(198, 110, 85, 51),  /* 20% прозрачность */
-                                             stop: 1 rgba(153, 86, 67, 51));  /* 20% прозрачность */
-                padding: 5px;                        
-            }
-            QMenu::item {
-                color: white;                        
-                padding: 8px 20px;                  
-            }
-            QMenu::item:selected {
-                background-color: rgba(255, 255, 255, 0.2);  
-            }
-            QMenu::separator {
-                height: 2px;                        
-                background-color: #444;             
-                margin: 5px 0;                      
-            }
-        """)
+        menu.setStyleSheet(styles.menu.menu)
 
         # Добавление действий в меню
         action_load = QAction("Загрузить", self)
@@ -184,19 +207,22 @@ class TaoApp(QWidget):
         # action_settings.triggered.connect()
         menu.addAction(action_settings)
 
-        action_exit = QAction("Выход", self)
-        action_exit.triggered.connect(self.close)
-        menu.addAction(action_exit)
+        action_donate = QAction("Донат", self)
+        action_donate.triggered.connect(self.close)
+        menu.addAction(action_donate)
 
         menu.exec(QPoint(self.pos().x(), self.pos().y() + 40))
 
     def update_position_header_info(self):
-        width = self.size().width()
+        """Позиционирование хедера."""
+
+        # Если окно в полноэкранном режиме
         if self.isFullScreen():
             self.title_window_icon.move(947, 5)
             self.name_header_text.move(855, 5)
             self.version_header_text.move(990, 4)
         else:
+            # Если окно в оконном режиме
             self.title_window_icon.move(627, 5)
             self.name_header_text.move(535, 5)
             self.version_header_text.move(670, 4)
@@ -237,13 +263,14 @@ class TaoApp(QWidget):
         screen = QApplication.primaryScreen()
         screen_rect = screen.geometry()
 
+        # Минимизация окна
         if self.geometry() == screen_rect:
             self.showNormal()
             self.update_coordinate_video_widget()
             self.update_position_control_buttons()
             self.update_position_header_info()
         else:
-            # тут надо сделать перемещение элементов либо настроить на % изменение
+            # Максимизация окна
             self.showFullScreen()
             self.update_coordinate_video_widget()
             self.update_position_control_buttons()
@@ -252,3 +279,16 @@ class TaoApp(QWidget):
     def wrap_window(self):
         """Сворачивание окна"""
         self.showMinimized()
+
+    def play_video(self):
+        """Воспроизведение видео."""
+        if self.media_player.playbackState() == QMediaPlayer.playbackState(self.media_player).PlayingState:
+            self.media_player.pause()
+            self.action_video.setIcon(QIcon("resources/play.png"))
+
+
+        else:
+            if self.media_player.mediaStatus() == self.media_player.MediaStatus.BufferedMedia:
+                self.media_player.play()
+                self.action_video.setIcon(QIcon("resources/pause.png"))
+

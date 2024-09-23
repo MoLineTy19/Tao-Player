@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import (
     QSizePolicy, QApplication, QFileDialog, QHBoxLayout
 )
 import config.gradient
+from config import app
 from styles.buttons import button_style
 from styles.main_window import default_text
 
@@ -15,25 +16,40 @@ from styles.main_window import default_text
 class TaoApp(QWidget):
     def __init__(self):
         super().__init__()
+
+
         self.drag_start_position = None
         self.default_window_geometry = (300, 200, 1280, 720)
-
+        self.resize(self.default_window_geometry[2], self.default_window_geometry[3])
         # Инициализация медиаплеера и виджета видео
         self.media_player = QMediaPlayer()
         self.audio_output = QAudioOutput()
         self.video_widget = QVideoWidget()
-        self.configure_video_widget()
+        self.update_coordinate_default_video_widget()
 
         self.media_player.setAudioOutput(self.audio_output)
         self.media_player.setVideoOutput(self.video_widget)
 
+        self.title_window_icon = None
+        self.name_header_text = None
+        self.version_header_text = None
+
+        self.close_button = None
+        self.wrap_button = None
+        self.maximize_button = None
+
         self.initialize_ui()
         self.set_window_position()
 
-    def configure_video_widget(self):
+    def update_coordinate_default_video_widget(self):
         """Настройка виджета видео."""
         self.video_widget.setMinimumWidth(1280)
         self.video_widget.setMinimumHeight(525)
+
+    def update_coordinate_maximize_video_widget(self):
+        """Настройка виджета видео."""
+        self.video_widget.setMinimumWidth(1920)
+        self.video_widget.setMinimumHeight(885)
 
     def initialize_ui(self):
         """Инициализация пользовательского интерфейса."""
@@ -44,6 +60,8 @@ class TaoApp(QWidget):
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
+
+        self.create_window_control_buttons()
 
         layout.addLayout(self.create_header_menu())
         layout.addWidget(self.video_widget)
@@ -81,20 +99,23 @@ class TaoApp(QWidget):
         menu_button.setStyleSheet(button_style)
 
         header_layout.addLayout(inner_layout)
-        self.create_window_control_buttons()
 
         return header_layout
 
     def create_window_control_buttons(self):
         """Создание кнопок для хедера"""
-        wrap_button = self.create_icon_button("resources/wrap.png", self.on_load_video_button_clicked)
-        wrap_button.move(1160, 0)
 
-        maximize_button = self.create_icon_button("resources/maximize.png", lambda: None)
-        maximize_button.move(1200, 0)
+        width = self.size().width()
+        self.wrap_button = self.create_icon_button("resources/wrap.png", self.wrap_window)
+        self.maximize_button = self.create_icon_button("resources/maximize.png", self.maximize_window)
+        self.close_button = self.create_icon_button("resources/close.png", self.close_window)
+        self.update_position_control_buttons()
 
-        close_button = self.create_icon_button("resources/close.png", lambda: None)
-        close_button.move(1240, 0)
+    def update_position_control_buttons(self):
+        width = self.size().width()
+        self.wrap_button.move(width - 40 * 3, 0)
+        self.maximize_button.move(width - 40 * 2, 0)
+        self.close_button.move(width - 40 * 1, 0)
 
     def create_icon_button(self, icon_path, action=None):
         """Генератор кнопок для хедера"""
@@ -113,26 +134,37 @@ class TaoApp(QWidget):
         inner_layout.setContentsMargins(0, 0, 0, 0)
         inner_layout.setSpacing(10)
 
+        # Логотип
+        label = QLabel()
+        inner_layout.addWidget(label)
+
         # Иконка
-        logo_label = QLabel()
+        self.title_window_icon = QLabel(self)
         logo_pixmap = QPixmap("logo.jpg")
-        logo_label.setPixmap(logo_pixmap)
-        logo_label.setMaximumHeight(40)
-        logo_label.setStyleSheet('QLabel { background-color: transparent; }')
+        self.title_window_icon.setPixmap(logo_pixmap)
+        self.title_window_icon.setStyleSheet('QLabel { background-color: transparent; }')
+
 
         # Название плеера
-        player_name_label = QLabel('<span style="color: white;">Tao</span> <span style="color: #BD321D;">Player</span>', self)
-        player_name_label.setStyleSheet(default_text + "font-size: 16px; font-weight: bold;")
-        player_name_label.move(530, 5)
+        self.name_header_text = QLabel('<span style="color: white;">Tao</span> <span style="color: #BD321D;">Player</span>',
+                                   self)
+        self.name_header_text.setStyleSheet(default_text + "font-size: 16px; font-weight: bold;")
 
         # Версия плеера
-        version_label = QLabel("ver. 0.1 alpha", self)
-        version_label.setStyleSheet(default_text + "font-size: 14px; font-weight: regular; color: white;")
-        version_label.move(668, 4)
+        self.version_header_text = QLabel(app.version, self)
+        self.version_header_text.setStyleSheet(default_text + "font-size: 14px; font-weight: regular; color: white;")
+
+        self.update_position_header_info()
 
         # Добавляем элементы во внутренний layout
-        inner_layout.addWidget(logo_label, alignment=Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        # inner_layout.addWidget(logo_label)
         return inner_layout
+
+    def update_position_header_info(self):
+        width = self.size().width()
+        self.title_window_icon.move(width // 2, 5)
+        self.name_header_text.move(int(width * 0.43), 5)
+        self.version_header_text.move(int(width * 0.5365), 4)
 
     def create_button(self, text):
         """Создание кнопки."""
@@ -167,3 +199,28 @@ class TaoApp(QWidget):
         print(f"Выбран файл: {video_file}")  # Отладочное сообщение
         self.media_player.setSource(QUrl.fromLocalFile(video_file))
         self.media_player.play()
+
+    def close_window(self):
+        """Закрытие окна."""
+        self.close()
+
+    def maximize_window(self):
+        """Максимизация окна."""
+        screen = QApplication.primaryScreen()
+        screen_rect = screen.geometry()
+        if self.geometry() == screen_rect:
+
+            self.showNormal()
+            self.update_coordinate_default_video_widget()
+            self.update_position_control_buttons()
+            self.update_position_header_info()
+        else:
+            # тут надо сделать перемещение элементов либо настроить на % изменение
+            self.showFullScreen()
+            self.update_coordinate_maximize_video_widget()
+            self.update_position_control_buttons()
+            self.update_position_header_info()
+
+    def wrap_window(self):
+        """Сворачивание окна"""
+        self.showMinimized()
